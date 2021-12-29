@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-header elevated class="bg-primary text-white" height-hint="98">
+    <q-header elevated class="bg-primary text-white non-selectable" height-hint="98">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
@@ -19,9 +19,15 @@
 
         <q-space />
 
-        <q-btn dense flat round icon="search" @click="toggleRightDrawer" />
+        <q-btn
+          dense
+          flat
+          icon="search"
+          label="搜索"
+          @click="toggleRightDrawer"
+        />
 
-        <q-btn color="white" dense flat round icon="menu">
+        <q-btn color="white" dense flat icon="menu" label="菜单">
           <q-menu>
             <q-list style="min-width: 100px">
               <q-item clickable>
@@ -40,115 +46,271 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
-      <!-- 人物信息 -->
-      <div v-if="dataType">
-        <q-list>
-          <q-btn
-            absolute
-            style="top: 15px; right: -17px; z-index: 2"
-            round
-            push
-            color="white"
-            text-color="blue"
-            icon="autorenew"
-            @click="switchImg"
-          />
-          <q-item>
-            <q-img
-              v-show="isBeforeAwake"
-              src="~assets/before.png"
-              loading="lazy"
-              height="250px"
-            />
-            <q-img
-              v-show="!isBeforeAwake"
-              src="~assets/after.png"
-              loading="lazy"
-              height="250px"
-            />
-          </q-item>
-          <q-separator spaced inset />
-          <q-item>
-            <q-item-section avatar>
-              <q-avatar size="50px" rounded>
-                <q-img :src="dataObj.icon" />
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <div class="row" style="display: flex; align-items: center">
-                <q-item-label class="text-h6">{{
-                  dataObj.displayName
-                }}</q-item-label>
-                <template
-                  v-for="(alias, index) in parseArr(dataObj.alias)"
-                  :key="index"
-                >
-                  <q-chip
-                    v-if="alias"
-                    :label="alias"
-                    dense
-                    text-color="white"
-                    :color="getColor(dataObj.property)"
-                  />
-                </template>
-              </div>
-              <q-item-label caption lines="2">{{ dataObj.name }}</q-item-label>
-              <q-item-label caption lines="2">cv:{{ dataObj.cv }}</q-item-label>
-            </q-item-section>
-            <q-item-section
-              side
-              class="column"
-              style="display: flex; align-items: center"
+    <q-drawer
+      show-if-above
+      v-model="leftDrawerOpen"
+      side="left"
+      :width="330"
+      bordered
+    >
+      <q-scroll-area class="full-height">
+        <!-- 人物信息 -->
+        <div v-if="dataType">
+          <q-list>
+            <q-expansion-item
+              expand-separator
+              icon="perm_identity"
+              label="查看立绘"
+              class="non-selectable"
+              :header-class="getColorClass(dataObj.property)"
+              :expand-icon-class="getColorClass(dataObj.property)"
+              header-style="text-align:center"
             >
               <q-btn
-                id="favorBtn"
+                absolute
+                style="top: 10px; right: -17px; z-index: 2"
                 round
                 push
-                dense
-                color="white"
-                text-color="red"
-                icon="favorite_border"
-                size="10px"
-                @click="onFavorBtnClick(dataObj.id)"
+                :class="getColorClass(dataObj.property)"
+                icon="autorenew"
+                @click="switchImg"
               />
-              <q-item-label>{{ dataObj.favor }}</q-item-label>
-              <q-avatar size="20px" style="margin-top: 5px">
-                <img v-if="dataObj.type == 1" src="~assets/pftype/fist.png" />
-                <img v-if="dataObj.type == 2" src="~assets/pftype/shoot.png" />
-                <img v-if="dataObj.type == 4" src="~assets/pftype/sword.png" />
-              </q-avatar>
-            </q-item-section>
-          </q-item>
-
-          <q-separator spaced />
-
-          <q-item>
-            <q-item-section>
-              <div>
-                <q-btn
-                  unelevated
-                  rounded
-                  dense
-                  :color="getColor(dataObj.property)"
-                  label="主动技能"
-                  size="sm"
+              <q-item dense>
+                <q-img
+                  v-show="isBeforeAwake"
+                  src="~assets/before.png"
+                  loading="lazy"
+                  height="300px"
                 />
-                <q-btn
-                  outline
-                  rounded
-                  dense
-                  :color="getColor(dataObj.property)"
-                  :label="dataObj.lbName"
-                  size="sm"
-                  style="margin-left: 5px"
+                <q-img
+                  v-show="!isBeforeAwake"
+                  src="~assets/after.png"
+                  loading="lazy"
+                  height="300px"
                 />
-              </div>
-              <q-item-label>{{ dataObj.lbData }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </div>
+              </q-item>
+            </q-expansion-item>
+
+            <q-separator spaced inset />
+            <q-item dense clickable ripple>
+              <q-item-section avatar class="non-selectable">
+                <q-avatar size="50px" rounded>
+                  <q-img :src="dataObj.icon" />
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <div class="row" style="display: flex; align-items: center">
+                  <q-item-label class="text-h6">{{
+                    dataObj.displayName
+                  }}</q-item-label>
+                  <template
+                    v-for="(alias, index) in parseArr(dataObj.alias)"
+                    :key="index"
+                  >
+                    <q-btn
+                      unelevated
+                      rounded
+                      :color="getColor(dataObj.property)"
+                      v-if="alias"
+                      :label="alias"
+                      padding="4px 10px"
+                      label="技能"
+                      size="sm"
+                      style="margin-left: 5px"
+                    />
+                  </template>
+                </div>
+                <q-item-label caption lines="2">{{
+                  dataObj.name
+                }}</q-item-label>
+                <q-item-label caption lines="2"
+                  >cv:{{ dataObj.cv }} 种族:{{ dataObj.race }}</q-item-label
+                >
+                <q-item-label caption lines="2"
+                  >攻击:{{ dataObj.atk }} 生命:{{ dataObj.hp }}</q-item-label
+                >
+              </q-item-section>
+              <q-item-section
+                side
+                class="column non-selectable"
+                style="display: flex; align-items: center"
+              >
+                <q-btn
+                  id="favorBtn"
+                  round
+                  flat
+                  dense
+                  color="white"
+                  text-color="red"
+                  icon="favorite_border"
+                  size="10px"
+                  @click="onFavorBtnClick(dataObj.id)"
+                />
+                <q-item-label>{{ dataObj.favor }}</q-item-label>
+                <q-avatar size="20px" style="margin-top: 5px">
+                  <img v-if="dataObj.type == 1" src="~assets/pftype/fist.png" />
+                  <img
+                    v-if="dataObj.type == 2"
+                    src="~assets/pftype/shoot.png"
+                  />
+                  <img
+                    v-if="dataObj.type == 4"
+                    src="~assets/pftype/sword.png"
+                  />
+                </q-avatar>
+                <q-item-label v-if="dataObj.type == 2">射手</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-separator spaced />
+
+            <q-item dense clickable ripple>
+              <q-item-section>
+                <div>
+                  <q-btn
+                    unelevated
+                    rounded
+                    :color="getColor(dataObj.property)"
+                    padding="4px 10px"
+                    label="技能"
+                    size="sm"
+                  />
+                  <q-btn
+                    outline
+                    dense
+                    :color="getColor(dataObj.property)"
+                    :label="dataObj.lbName"
+                    size="sm"
+                    style="margin-left: 5px"
+                  />
+                  <q-btn
+                    outline
+                    dense
+                    :color="getColor(dataObj.property)"
+                    :label="'充能' + dataObj.energy"
+                    size="sm"
+                    style="margin-left: 5px"
+                  />
+                </div>
+                <q-item-section class="q-pa-sm">
+                  <q-item-label caption>{{ dataObj.lb }}</q-item-label>
+                  <q-item-label>{{ dataObj.lbData }}</q-item-label>
+                </q-item-section>
+              </q-item-section>
+            </q-item>
+
+            <q-separator />
+
+            <q-item dense clickable ripple>
+              <q-item-section avatar>
+                <div>
+                  <q-btn
+                    unelevated
+                    rounded
+                    :color="getColor(dataObj.property)"
+                    padding="4px 10px"
+                    label="被动1"
+                    size="sm"
+                  />
+                </div>
+              </q-item-section>
+              <q-item-section class="q-pa-sm">
+                <q-item-label>{{ dataObj.iPassive }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator inset />
+            <q-item dense clickable ripple>
+              <q-item-section avatar>
+                <div>
+                  <q-btn
+                    unelevated
+                    rounded
+                    :color="getColor(dataObj.property)"
+                    padding="4px 10px"
+                    label="被动2"
+                    size="sm"
+                  />
+                </div>
+              </q-item-section>
+              <q-item-section class="q-pa-sm">
+                <q-item-label>{{ dataObj.iiPassive }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator inset />
+            <q-item dense clickable ripple>
+              <q-item-section avatar>
+                <div>
+                  <q-btn
+                    unelevated
+                    rounded
+                    :color="getColor(dataObj.property)"
+                    padding="4px 10px"
+                    label="被动3"
+                    size="sm"
+                  />
+                </div>
+              </q-item-section>
+              <q-item-section class="q-pa-sm">
+                <q-item-label>{{ dataObj.iiiPassive }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator inset />
+            <q-item dense clickable ripple v-if="dataObj.ivPassive">
+              <q-item-section avatar>
+                <div>
+                  <q-btn
+                    unelevated
+                    rounded
+                    :color="getColor(dataObj.property)"
+                    padding="4px 10px"
+                    label="被动4"
+                    size="sm"
+                  />
+                </div>
+              </q-item-section>
+              <q-item-section class="q-pa-sm">
+                <q-item-label>{{ dataObj.ivPassive }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator inset />
+            <q-item dense clickable ripple v-if="dataObj.vPassive">
+              <q-item-section avatar>
+                <div>
+                  <q-btn
+                    unelevated
+                    rounded
+                    :color="getColor(dataObj.property)"
+                    padding="4px 10px"
+                    label="被动5"
+                    size="sm"
+                  />
+                </div>
+              </q-item-section>
+              <q-item-section class="q-pa-sm">
+                <q-item-label>{{ dataObj.vPassive }}</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator inset />
+            <q-item dense clickable ripple v-if="dataObj.viPassive">
+              <q-item-section avatar>
+                <div>
+                  <q-btn
+                    unelevated
+                    rounded
+                    :color="getColor(dataObj.property)"
+                    padding="4px 10px"
+                    label="被动6"
+                    size="sm"
+                  />
+                </div>
+              </q-item-section>
+              <q-item-section class="q-pa-sm">
+                <q-item-label>{{ dataObj.viPassive }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+      </q-scroll-area>
     </q-drawer>
 
     <q-drawer v-model="rightDrawerOpen" side="right" overlay elevated>
@@ -272,13 +434,32 @@ export default defineComponent({
           case 1:
             return "blue-5";
           case 2:
-            return "yellow-5";
+            return "amber-7";
           case 3:
             return "green-5";
           case 4:
-            return "grey-8";
+            return "grey-6";
           case 5:
             return "indigo-10";
+
+          default:
+            break;
+        }
+      },
+      getColorClass(attribute) {
+        switch (attribute) {
+          case 0:
+            return "text-red-5";
+          case 1:
+            return "text-blue-5";
+          case 2:
+            return "text-amber-7";
+          case 3:
+            return "text-green-5";
+          case 4:
+            return "text-grey-6";
+          case 5:
+            return "text-indigo-10";
 
           default:
             break;
@@ -308,3 +489,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.div {
+  overflow: hidden;
+}
+</style>

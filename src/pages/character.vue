@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-start q-pa-md">
+  <q-page class="flex flex-start q-pa-md non-selectable">
     <div
       class="column justify-start q-gutter-sm"
       style="min-width: 100%; min-height: 100%"
